@@ -25,7 +25,7 @@ html, body{
   background: rgb(250, 250, 250);
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
+  padding: 1rem 2rem;
 	color: rgb(82, 80, 80);
   height: 100%;
 }

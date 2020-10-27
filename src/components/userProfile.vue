@@ -13,12 +13,14 @@
 				<button v-on:click="followUser">{{ templateData.follow }}</button>
 			</div>
 		</div>
-		<div class="user-profile__twits" @dragover="dragOver">
+		<div class="user-profile__twits" @dragOver="dragOver">
 			<Twit
-				v-for="twit in user.twits"
+				v-for="(twit, index) in user.twits"
 				:key="twit.id"
 				:twit="twit"
 				:username="user.username"
+                :data-twitid="index"
+                @drageventended = "dragEventEnded"
 			/>
 		</div>
 	</div>
@@ -50,7 +52,8 @@ export default {
 			},
 			templateData: {
 				follow: "follow",
-			},
+            },
+            dragProps: null
 		};
 	},
 	computed: {
@@ -62,15 +65,17 @@ export default {
 		followUser() {
 			this.followers++;
 			this.templateData.follow = "unfollow";
-		},
-		dragOver(e) {
+        },
+        
+		dragOver(e) { // this does not affect the twits array indexing
             e.preventDefault();
-            // const container = e.target.parentNode;
-            const container = document.querySelector('.user-profile__twits')
+            const container = document.querySelector('.user-profile__twits');
             const dragOverElement = this.getClosestNode(container, e.clientY);
             const dragItem = container.querySelector('.dragging');
-            container.insertBefore(dragItem, dragOverElement)	
+            container.insertBefore(dragItem, dragOverElement);
+            this.dragProps = {dragItem, dragOverElement};
         },
+
         getClosestNode(container, y){
             const draggableElement = [...container.querySelectorAll('.draggable:not(.dragging)')];
 
@@ -83,7 +88,24 @@ export default {
                     return closest;
                 }
             }, {offset: Number.NEGATIVE_INFINITY}).element;
-        }
+        },
+
+       /*  updateTwitAfterDrag(dragId, dragOverId, twitArray){
+            const startIndex = dragOverId < 0 ? twitArray.length + dragId : 0;
+            const sourceItem = twitArray.splice(dragId,1)[0];
+            twitArray.splice(startIndex, 0, sourceItem);
+            return twitArray;
+        },
+
+        dragEventEnded(){
+            if(this.dragProps){
+                const {dragItem, dragOverElement} = this.dragProps;
+                console.log(dragItem);
+                console.log(dragItem.dataset.twitid, dragOverElement.dataset.twitid)
+                const newArray = this.updateTwitAfterDrag(dragItem.dataset.twitid, dragOverElement.dataset.twitid, this.user.twits);
+                this.user.twits = newArray;	
+            }
+        } */
 	},
 };
 </script>

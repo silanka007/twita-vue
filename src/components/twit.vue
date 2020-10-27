@@ -24,7 +24,7 @@ export default {
         },
         dragEnd(e){
             e.target.classList.remove('dragging');
-            this.$emit('drageventended', e.target);
+            // this.$emit('drageventended', e.target);
         }
     }
 }

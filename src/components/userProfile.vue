@@ -4,7 +4,7 @@
 			<h1 class="user-profile__username">@{{ user.username }}</h1>
 			<div
 				class="user-profile__admin-badge"
-				v-if="user.isAdmin && followers > 10"
+				v-if="user.isAdmin"
 			>
 				Admin
 			</div>
@@ -12,6 +12,7 @@
 				<strong>follower: {{ followers }} - </strong>
 				<button v-on:click="followUser">{{ templateData.follow }}</button>
 			</div>
+            <AddTwitForm @addtwit="addTwit" />
 		</div>
 		<div class="user-profile__twits" @dragOver="dragOver">
 			<Twit
@@ -20,7 +21,6 @@
 				:twit="twit"
 				:username="user.username"
                 :data-twitid="index"
-                @drageventended = "dragEventEnded"
 			/>
 		</div>
 	</div>
@@ -28,17 +28,19 @@
 
 <script>
 import Twit from "./twit";
+import AddTwitForm from "./addTwit";
+
 export default {
 	name: "userProfile",
 	components: {
-		Twit,
+        Twit,
+        AddTwitForm
 	},
 	data() {
 		return {
-			followers: 0,
+			followers: 5,
 			user: {
 				id: 1,
-				followers: 0,
 				username: "Rx_Silanka",
 				firstName: "Paul",
 				lastName: "Onyekwelu",
@@ -62,11 +64,17 @@ export default {
 		},
 	},
 	methods: {
+        // follow user by clicking follow button
 		followUser() {
 			this.followers++;
 			this.templateData.follow = "unfollow";
         },
-        
+        // add twit to users twit
+        addTwit(twitObject){
+            const {content} = twitObject;
+            this.user.twits.unshift({id: content, content})
+        },
+        // handles dragover functionality
 		dragOver(e) { // this does not affect the twits array indexing
             e.preventDefault();
             const container = document.querySelector('.user-profile__twits');
@@ -75,7 +83,6 @@ export default {
             container.insertBefore(dragItem, dragOverElement);
             this.dragProps = {dragItem, dragOverElement};
         },
-
         getClosestNode(container, y){
             const draggableElement = [...container.querySelectorAll('.draggable:not(.dragging)')];
 
@@ -89,14 +96,12 @@ export default {
                 }
             }, {offset: Number.NEGATIVE_INFINITY}).element;
         },
-
        /*  updateTwitAfterDrag(dragId, dragOverId, twitArray){
             const startIndex = dragOverId < 0 ? twitArray.length + dragId : 0;
             const sourceItem = twitArray.splice(dragId,1)[0];
             twitArray.splice(startIndex, 0, sourceItem);
             return twitArray;
         },
-
         dragEventEnded(){
             if(this.dragProps){
                 const {dragItem, dragOverElement} = this.dragProps;

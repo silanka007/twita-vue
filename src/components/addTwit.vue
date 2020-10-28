@@ -35,7 +35,11 @@ export default {
 	},
 	methods: {
 		onSubmitHandler() {
-			this.$emit("addtwit", { type: this.twitType, content: this.twitContent });
+            if(this.twitType === "draft"){
+                return;
+            }
+            this.$emit("addtwit", { type: this.twitType, content: this.twitContent });
+            this.twitContent = "";
 		},
 	},
 };

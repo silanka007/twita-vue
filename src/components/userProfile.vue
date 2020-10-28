@@ -2,17 +2,14 @@
 	<div class="user-profile">
 		<div class="user-profile__user-panel">
 			<h1 class="user-profile__username">@{{ user.username }}</h1>
-			<div
-				class="user-profile__admin-badge"
-				v-if="user.isAdmin"
-			>
+			<div class="user-profile__admin-badge" v-if="user.isAdmin">
 				Admin
 			</div>
 			<div class="user-profile__follower-count">
 				<strong>follower: {{ followers }} - </strong>
 				<button v-on:click="followUser">{{ templateData.follow }}</button>
 			</div>
-            <AddTwitForm @addtwit="addTwit" />
+			<AddTwitForm @addtwit="addTwit" />
 		</div>
 		<div class="user-profile__twits" @dragOver="dragOver">
 			<Twit
@@ -20,7 +17,7 @@
 				:key="twit.id"
 				:twit="twit"
 				:username="user.username"
-                :data-twitid="index"
+				:data-twitid="index"
 			/>
 		</div>
 	</div>
@@ -33,8 +30,8 @@ import AddTwitForm from "./addTwit";
 export default {
 	name: "userProfile",
 	components: {
-        Twit,
-        AddTwitForm
+		Twit,
+		AddTwitForm,
 	},
 	data() {
 		return {
@@ -54,8 +51,8 @@ export default {
 			},
 			templateData: {
 				follow: "follow",
-            },
-            dragProps: null
+			},
+			dragProps: null,
 		};
 	},
 	computed: {
@@ -64,39 +61,46 @@ export default {
 		},
 	},
 	methods: {
-        // follow user by clicking follow button
+		// follow user by clicking follow button
 		followUser() {
 			this.followers++;
 			this.templateData.follow = "unfollow";
-        },
-        // add twit to users twit
-        addTwit(twitObject){
-            const {content} = twitObject;
-            this.user.twits.unshift({id: content, content})
-        },
-        // handles dragover functionality
-		dragOver(e) { // this does not affect the twits array indexing
-            e.preventDefault();
-            const container = document.querySelector('.user-profile__twits');
-            const dragOverElement = this.getClosestNode(container, e.clientY);
-            const dragItem = container.querySelector('.dragging');
-            container.insertBefore(dragItem, dragOverElement);
-            this.dragProps = {dragItem, dragOverElement};
-        },
-        getClosestNode(container, y){
-            const draggableElement = [...container.querySelectorAll('.draggable:not(.dragging)')];
+		},
+		// add twit to users twit
+		addTwit(twitObject) {
+			let { content } = twitObject;
+			this.user.twits.unshift({ id: this.user.twits.length + 1, content });
+			content = "";
+		},
+		// handles dragover functionality
+		dragOver(e) {
+			// this does not affect the twits array indexing
+			e.preventDefault();
+			const container = document.querySelector(".user-profile__twits");
+			const dragOverElement = this.getClosestNode(container, e.clientY);
+			const dragItem = container.querySelector(".dragging");
+			container.insertBefore(dragItem, dragOverElement);
+			this.dragProps = { dragItem, dragOverElement };
+		},
+		getClosestNode(container, y) {
+			const draggableElement = [
+				...container.querySelectorAll(".draggable:not(.dragging)"),
+			];
 
-            return draggableElement.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - (box.top + (box.height/2));
-                if(offset < 0 && offset > closest.offset){
-                    return {element: child, offset};
-                }else{
-                    return closest;
-                }
-            }, {offset: Number.NEGATIVE_INFINITY}).element;
-        },
-       /*  updateTwitAfterDrag(dragId, dragOverId, twitArray){
+			return draggableElement.reduce(
+				(closest, child) => {
+					const box = child.getBoundingClientRect();
+					const offset = y - (box.top + box.height / 2);
+					if (offset < 0 && offset > closest.offset) {
+						return { element: child, offset };
+					} else {
+						return closest;
+					}
+				},
+				{ offset: Number.NEGATIVE_INFINITY }
+			).element;
+		},
+		/*  updateTwitAfterDrag(dragId, dragOverId, twitArray){
             const startIndex = dragOverId < 0 ? twitArray.length + dragId : 0;
             const sourceItem = twitArray.splice(dragId,1)[0];
             twitArray.splice(startIndex, 0, sourceItem);
@@ -115,33 +119,33 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .user-profile {
 	display: flex;
 	justify-content: space-between;
-}
 
-.user-profile__user-panel {
-	display: flex;
-	flex-direction: column;
-	background: white;
-	padding: 1rem;
-	box-shadow: 0px 0px 4px rgb(189, 189, 189);
-	margin-bottom: auto;
-	margin-right: 1rem;
-	flex: 1;
-}
+	.user-profile__user-panel {
+		display: flex;
+		flex-direction: column;
+		background: white;
+		padding: 1rem;
+		box-shadow: 0px 0px 4px rgb(189, 189, 189);
+		margin-bottom: auto;
+		margin-right: 1rem;
+		flex: 1;
 
-.user-profile__admin-badge {
-	background: rebeccapurple;
-	color: white;
-	padding: 3px;
-	margin-right: auto;
-	border-radius: 5px;
-}
+		.user-profile__admin-badge {
+			background: rebeccapurple;
+			color: white;
+			padding: 3px;
+			margin-right: auto;
+			border-radius: 5px;
+		}
+	}
 
-.user-profile__twits {
-	flex: 2;
-    padding: 0 1rem;
+	.user-profile__twits {
+		flex: 2;
+		padding: 0 1rem;
+	}
 }
 </style>

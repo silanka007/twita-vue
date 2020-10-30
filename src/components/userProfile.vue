@@ -1,22 +1,22 @@
 <template>
 	<div class="user-profile">
 		<div class="user-profile__user-panel">
-			<h1 class="user-profile__username">@{{ user.username }}</h1>
-			<div class="user-profile__admin-badge" v-if="user.isAdmin">
+			<h1 class="user-profile__username">@{{ state.user.username }}</h1>
+			<div class="user-profile__admin-badge" v-if="state.user.isAdmin">
 				Admin
 			</div>
 			<div class="user-profile__follower-count">
-				<strong>follower: {{ followers }} - </strong>
-				<button v-on:click="followUser">{{ templateData.follow }}</button>
+				<strong>follower: {{ state.followers }} - </strong>
+				<button v-on:click="followUser">{{ state.templateData.follow }}</button>
 			</div>
 			<AddTwitForm @addtwit="addTwit" />
 		</div>
 		<div class="user-profile__twits" @dragOver="dragOver">
 			<Twit
-				v-for="(twit, index) in user.twits"
+				v-for="(twit, index) in state.user.twits"
 				:key="twit.id"
 				:twit="twit"
-				:username="user.username"
+				:username="state.user.username"
 				:data-twitid="index"
 			/>
 		</div>
@@ -26,6 +26,7 @@
 <script>
 import Twit from "./twit";
 import AddTwitForm from "./addTwit";
+import { computed, reactive } from "vue";
 
 export default {
 	name: "userProfile",
@@ -33,8 +34,8 @@ export default {
 		Twit,
 		AddTwitForm,
 	},
-	data() {
-		return {
+	setup() {
+		const state = reactive({
 			followers: 5,
 			user: {
 				id: 1,
@@ -53,36 +54,36 @@ export default {
 				follow: "follow",
 			},
 			dragProps: null,
-		};
-	},
-	computed: {
-		fullname() {
-			return `${this.user.firstName} ${this.user.lastName}`;
-		},
-	},
-	methods: {
+		})
+
+		const fullname = computed(() => {
+			return `${state.user.firstName} ${state.user.lastName}`;
+		})
+
 		// follow user by clicking follow button
-		followUser() {
-			this.followers++;
-			this.templateData.follow = "unfollow";
-		},
+		const followUser = () => {
+			state.followers++;
+			state.templateData.follow = "unfollow";
+		}
+
 		// add twit to users twit
-		addTwit(twitObject) {
+		const addTwit = (twitObject) => {
 			let { content } = twitObject;
-			this.user.twits.unshift({ id: this.user.twits.length + 1, content });
+			state.user.twits.unshift({ id: state.user.twits.length + 1, content });
 			content = "";
-		},
+		}
 		// handles dragover functionality
-		dragOver(e) {
+		const dragOver = (e) => {
 			// this does not affect the twits array indexing
 			e.preventDefault();
 			const container = document.querySelector(".user-profile__twits");
-			const dragOverElement = this.getClosestNode(container, e.clientY);
+			const dragOverElement = state.getClosestNode(container, e.clientY);
 			const dragItem = container.querySelector(".dragging");
 			container.insertBefore(dragItem, dragOverElement);
-			this.dragProps = { dragItem, dragOverElement };
-		},
-		getClosestNode(container, y) {
+			state.dragProps = { dragItem, dragOverElement };
+		}
+
+		const getClosestNode = (container, y) => {
 			const draggableElement = [
 				...container.querySelectorAll(".draggable:not(.dragging)"),
 			];
@@ -99,7 +100,7 @@ export default {
 				},
 				{ offset: Number.NEGATIVE_INFINITY }
 			).element;
-		},
+		}
 		/*  updateTwitAfterDrag(dragId, dragOverId, twitArray){
             const startIndex = dragOverId < 0 ? twitArray.length + dragId : 0;
             const sourceItem = twitArray.splice(dragId,1)[0];
@@ -115,7 +116,10 @@ export default {
                 this.user.twits = newArray;	
             }
         } */
-	},
+
+
+		return { state, fullname, followUser, addTwit, dragOver, getClosestNode }
+	}
 };
 </script>
 

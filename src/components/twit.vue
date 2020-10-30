@@ -22,14 +22,19 @@ export default {
 			required: true,
 		},
 	},
-	methods: {
-		dragStart(e) {
+	setup() {
+		const dragStart = e => {
 			e.target.classList.add("dragging");
-		},
-		dragEnd(e) {
+		};
+		const dragEnd = e => {
 			e.target.classList.remove("dragging");
 			// this.$emit('drageventended', e.target);
-		},
+		};
+
+		return {
+			dragStart,
+			dragEnd,
+		};
 	},
 };
 </script>

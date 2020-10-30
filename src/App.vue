@@ -16,11 +16,6 @@ export default {
 </script>
 
 <style lang="scss">
-html,
-body {
-	height: 100%;
-}
-
 #app {
 	background: rgb(250, 250, 250);
 	display: flex;
